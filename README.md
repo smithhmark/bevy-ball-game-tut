@@ -1,4 +1,4 @@
-= Ball Game Tutorial =
+# Ball Game Tutorial #
 
 This is a working through of the Ball Game Tutorial by YouTuber [Jaques]( https://www.youtube.com/@jacques-dev). See the play list: [here](https://www.youtube.com/playlist?list=PLVnntJRoP85JHGX7rGDu6LaF3fmDDbqyd)
 
