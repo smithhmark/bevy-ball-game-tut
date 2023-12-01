@@ -8,12 +8,15 @@ const NUMBER_OF_ENEMIES: usize = 4;
 const ENEMY_SPEED: f32 = 200.0;
 const ENEMY_SIZE: f32 = 64.0;
 
+const NUMBER_OF_STARS: usize = 10;
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, spawn_player)
         .add_systems(Startup, spawn_enemies)
+        .add_systems(Startup, spawn_stars)
         .add_systems(Update, player_movement)
         .add_systems(Update, enemy_movement)
         .add_systems(Update, confine_player_movement)
@@ -24,6 +27,9 @@ fn main() {
 
 #[derive(Component)]
 struct Player {}
+
+#[derive(Component)]
+struct Star {}
 
 #[derive(Component)]
 struct Enemy {
@@ -88,6 +94,30 @@ fn spawn_enemies(
             Enemy {
                 direction: Vec2::new(random(), random::<f32>()).normalize(),
             },
+        ));
+    }
+}
+
+fn spawn_stars(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    asset_server: Res<AssetServer>,
+) {
+    let window = window_query.get_single().unwrap();
+
+    for star_no in 0..NUMBER_OF_STARS {
+        let random_x = random::<f32>() * window.width();
+        let random_y = random::<f32>() * window.height();
+
+        println!("star: {star_no} @ {random_x},{random_y}");
+
+        commands.spawn((
+            SpriteBundle {
+                transform: Transform::from_xyz(random_x, random_y, 0.0),
+                texture: asset_server.load("sprites/star.png"),
+                ..default()
+            },
+            Star {},
         ));
     }
 }
