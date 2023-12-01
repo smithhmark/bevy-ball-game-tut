@@ -5,6 +5,36 @@ use super::components::*;
 use super::resources::*;
 use super::{ENEMY_SIZE, ENEMY_SPEED, NUMBER_OF_ENEMIES};
 
+fn spawn_single_enemy(commands: &mut Commands, window: &Window, asset_server: &Res<AssetServer>) {
+    let half_enemy_size = ENEMY_SIZE / 2.0;
+    let mut random_x = random::<f32>() * window.width();
+    let mut random_y = random::<f32>() * window.height();
+    let x_min = 0.0 + half_enemy_size;
+    let x_max = window.width() - half_enemy_size;
+    let y_min = 0.0 + half_enemy_size;
+    let y_max = window.height() - half_enemy_size;
+    if random_x < x_min {
+        random_x = x_min;
+    } else if random_x > x_max {
+        random_x = x_max;
+    }
+    if random_y < y_min {
+        random_y = y_min;
+    } else if random_y > y_max {
+        random_y = y_max;
+    }
+    commands.spawn((
+        SpriteBundle {
+            transform: Transform::from_xyz(random_x, random_y, 0.0),
+            texture: asset_server.load("sprites/ball_red_large.png"),
+            ..default()
+        },
+        Enemy {
+            direction: Vec2::new(random(), random::<f32>()).normalize(),
+        },
+    ));
+}
+
 pub fn spawn_enemies(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -12,22 +42,8 @@ pub fn spawn_enemies(
 ) {
     let window = window_query.get_single().unwrap();
 
-    for enemy_number in 0..NUMBER_OF_ENEMIES {
-        let random_x = random::<f32>() * window.width();
-        let random_y = random::<f32>() * window.height();
-
-        println!("enemy: {enemy_number} @ {random_x},{random_y}");
-
-        commands.spawn((
-            SpriteBundle {
-                transform: Transform::from_xyz(random_x, random_y, 0.0),
-                texture: asset_server.load("sprites/ball_red_large.png"),
-                ..default()
-            },
-            Enemy {
-                direction: Vec2::new(random(), random::<f32>()).normalize(),
-            },
-        ));
+    for _ in 0..NUMBER_OF_ENEMIES {
+        spawn_single_enemy(&mut commands, window, &asset_server);
     }
 }
 
@@ -55,11 +71,18 @@ pub fn update_enemy_direction(
         let mut direction_changed = false;
         let translation = transform.translation;
 
-        if translation.x <= x_min || translation.x >= x_max {
+        if translation.x < x_min && enemy.direction.x < 0.0 {
+            enemy.direction.x *= -1.0;
+            direction_changed = true;
+        } else if translation.x > x_max && enemy.direction.x > 0.0 {
             enemy.direction.x *= -1.0;
             direction_changed = true;
         }
-        if translation.y <= y_min || translation.y >= y_max {
+
+        if translation.y < y_min && enemy.direction.y < 0.0 {
+            enemy.direction.y *= -1.0;
+            direction_changed = true;
+        } else if translation.y > y_max && enemy.direction.y > 0.0 {
             enemy.direction.y *= -1.0;
             direction_changed = true;
         }
@@ -93,17 +116,6 @@ pub fn spawn_enemies_over_time(
 ) {
     if enemy_spawn_timer.timer.finished() {
         let window = window_query.get_single().unwrap();
-        let random_x = random::<f32>() * window.width();
-        let random_y = random::<f32>() * window.height();
-        commands.spawn((
-            SpriteBundle {
-                transform: Transform::from_xyz(random_x, random_y, 0.0),
-                texture: asset_server.load("sprites/ball_red_large.png"),
-                ..default()
-            },
-            Enemy {
-                direction: Vec2::new(random(), random::<f32>()).normalize(),
-            },
-        ));
+        spawn_single_enemy(&mut commands, window, &asset_server);
     }
 }
