@@ -14,7 +14,7 @@ pub fn update_high_scores(
     mut high_scores: ResMut<HighScores>,
 ) {
     for event in game_over_event_reader.read() {
-        println!("Your final score is: {}", event.score);
+        println!("Sending your final score: {}", event.score);
         high_scores
             .scores
             .push(("Player One".to_string(), event.score));
