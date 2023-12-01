@@ -5,4 +5,13 @@ This is a working through of the Ball Game Tutorial by YouTuber [Jaques]( https:
 **NOTE:** Jacques' original tutorial is for Bevy v0.10. I am updating the example to v0.12 as I go.
 
 
+## Running ##
+
+I have been executing: 
+`cargo run --features "bevy/dynamic_linking"`
+to get very fast development cycles.
+
+## Todo items ##
+- Official examples put audio assets in Resources, rather than use the asset_server over and over again
+- Episode 8 of the tutorial [here](https://youtu.be/i-Wczghlmxc?si=VngRYpFSBJu9jmWr&t=554) uses explicit `SystemsSet`'s to order player movement and then confining the movement to the playarea. That capability is deprecated as it is described. See the `TODO` in src/enemy/mod.rs
 
