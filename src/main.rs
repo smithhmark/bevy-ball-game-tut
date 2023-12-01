@@ -1,6 +1,10 @@
 use bevy::{app::AppExit, prelude::*, window::PrimaryWindow};
 use rand::prelude::*;
 
+mod components;
+
+use components::*;
+
 const PLAYER_SPEED: f32 = 500.0;
 const PLAYER_SIZE: f32 = 64.0;
 
@@ -41,17 +45,6 @@ fn main() {
         .add_systems(Update, update_high_scores)
         .add_systems(Update, high_scores_updated)
         .run();
-}
-
-#[derive(Component)]
-struct Player {}
-
-#[derive(Component)]
-struct Star {}
-
-#[derive(Component)]
-struct Enemy {
-    direction: Vec2,
 }
 
 #[derive(Resource)]
