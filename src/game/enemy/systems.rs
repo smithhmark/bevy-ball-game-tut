@@ -1,9 +1,9 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use rand::random;
 
-use crate::enemy::components::*;
-use crate::enemy::resources::*;
-use crate::enemy::{ENEMY_SIZE, ENEMY_SPEED, NUMBER_OF_ENEMIES};
+use super::components::*;
+use super::resources::*;
+use super::{ENEMY_SIZE, ENEMY_SPEED, NUMBER_OF_ENEMIES};
 
 pub fn spawn_enemies(
     mut commands: Commands,
