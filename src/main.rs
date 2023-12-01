@@ -4,9 +4,11 @@ use rand::prelude::*;
 const PLAYER_SPEED: f32 = 500.0;
 const PLAYER_SIZE: f32 = 64.0;
 
-const NUMBER_OF_ENEMIES: usize = 4;
+//const NUMBER_OF_ENEMIES: usize = 4;
+const NUMBER_OF_ENEMIES: usize = 1;
 const ENEMY_SPEED: f32 = 200.0;
 const ENEMY_SIZE: f32 = 64.0;
+const ENEMY_SPAWN_TIME: f32 = 5.0;
 
 const NUMBER_OF_STARS: usize = 10;
 const STAR_SIZE: f32 = 30.0;
@@ -17,6 +19,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .init_resource::<Score>()
         .init_resource::<StarSpawnTimer>()
+        .init_resource::<EnemySpawnTimer>()
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, spawn_player)
         .add_systems(Startup, spawn_enemies)
@@ -29,7 +32,9 @@ fn main() {
         .add_systems(Update, player_hit_star)
         .add_systems(Update, update_score)
         .add_systems(Update, tick_star_spawn_timer)
+        .add_systems(Update, tick_enemy_spawn_timer)
         .add_systems(Update, spawn_stars_over_time)
+        //.add_systems(Update, spawn_enemies_over_time)
         .run();
 }
 
@@ -52,6 +57,19 @@ struct Score {
 impl Default for Score {
     fn default() -> Self {
         Score { value: 0 }
+    }
+}
+
+#[derive(Resource)]
+struct EnemySpawnTimer {
+    timer: Timer,
+}
+
+impl Default for EnemySpawnTimer {
+    fn default() -> Self {
+        Self {
+            timer: Timer::from_seconds(ENEMY_SPAWN_TIME, TimerMode::Repeating),
+        }
     }
 }
 
@@ -235,11 +253,11 @@ fn update_enemy_direction(
         let mut direction_changed = false;
         let translation = transform.translation;
 
-        if translation.x < x_min || translation.x > x_max {
+        if translation.x <= x_min || translation.x >= x_max {
             enemy.direction.x *= -1.0;
             direction_changed = true;
         }
-        if translation.y < y_min || translation.y > y_max {
+        if translation.y <= y_min || translation.y >= y_max {
             enemy.direction.y *= -1.0;
             direction_changed = true;
         }
@@ -278,7 +296,6 @@ fn player_hit_star(
                 .distance(star_transform.translation);
             if distance < player_radius + star_radius {
                 score.value += 1;
-                println!("point!");
                 let sound_effect = asset_server.load("sounds/laserLarge_000.ogg");
                 commands.spawn(AudioBundle {
                     source: sound_effect,
@@ -343,6 +360,32 @@ fn spawn_stars_over_time(
                 ..default()
             },
             Star {},
+        ));
+    }
+}
+
+fn tick_enemy_spawn_timer(mut enemy_spawn_timer: ResMut<EnemySpawnTimer>, time: Res<Time>) {
+    enemy_spawn_timer.timer.tick(time.delta());
+}
+fn spawn_enemies_over_time(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    asset_server: Res<AssetServer>,
+    enemy_spawn_timer: Res<EnemySpawnTimer>,
+) {
+    if enemy_spawn_timer.timer.finished() {
+        let window = window_query.get_single().unwrap();
+        let random_x = random::<f32>() * window.width();
+        let random_y = random::<f32>() * window.height();
+        commands.spawn((
+            SpriteBundle {
+                transform: Transform::from_xyz(random_x, random_y, 0.0),
+                texture: asset_server.load("sprites/ball_red_large.png"),
+                ..default()
+            },
+            Enemy {
+                direction: Vec2::new(random(), random::<f32>()).normalize(),
+            },
         ));
     }
 }
