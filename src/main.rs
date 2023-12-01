@@ -185,7 +185,7 @@ fn update_enemy_direction(
             let sound1 = asset_server.load("sounds/pluck_001.ogg");
             let sound2 = asset_server.load("sounds/pluck_002.ogg");
 
-            let sound_effect = if random::<f32>() < 0.0 {
+            let sound_effect = if random::<f32>() < 0.5 {
                 sound1
             } else {
                 sound2
