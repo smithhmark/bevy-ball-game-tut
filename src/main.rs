@@ -2,8 +2,10 @@ use bevy::{app::AppExit, prelude::*, window::PrimaryWindow};
 use rand::prelude::*;
 
 mod components;
+mod resources;
 
 use components::*;
+use resources::*;
 
 const PLAYER_SPEED: f32 = 500.0;
 const PLAYER_SIZE: f32 = 64.0;
@@ -11,11 +13,9 @@ const PLAYER_SIZE: f32 = 64.0;
 const NUMBER_OF_ENEMIES: usize = 4;
 const ENEMY_SPEED: f32 = 200.0;
 const ENEMY_SIZE: f32 = 64.0;
-const ENEMY_SPAWN_TIME: f32 = 5.0;
 
 const NUMBER_OF_STARS: usize = 10;
 const STAR_SIZE: f32 = 30.0;
-const STAR_SPAWN_TIME: f32 = 1.0;
 
 fn main() {
     App::new()
@@ -46,55 +46,6 @@ fn main() {
         .add_systems(Update, high_scores_updated)
         .run();
 }
-
-#[derive(Resource)]
-struct Score {
-    value: u32,
-}
-
-impl Default for Score {
-    fn default() -> Self {
-        Score { value: 0 }
-    }
-}
-
-#[derive(Resource)]
-struct HighScores {
-    scores: Vec<(String, u32)>,
-}
-
-impl Default for HighScores {
-    fn default() -> Self {
-        Self { scores: Vec::new() }
-    }
-}
-
-#[derive(Resource)]
-struct EnemySpawnTimer {
-    timer: Timer,
-}
-
-impl Default for EnemySpawnTimer {
-    fn default() -> Self {
-        Self {
-            timer: Timer::from_seconds(ENEMY_SPAWN_TIME, TimerMode::Repeating),
-        }
-    }
-}
-
-#[derive(Resource)]
-struct StarSpawnTimer {
-    timer: Timer,
-}
-
-impl Default for StarSpawnTimer {
-    fn default() -> Self {
-        Self {
-            timer: Timer::from_seconds(STAR_SPAWN_TIME, TimerMode::Repeating),
-        }
-    }
-}
-
 #[derive(Event)]
 struct GameOver {
     score: u32,
