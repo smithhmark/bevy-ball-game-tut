@@ -5,11 +5,13 @@ pub mod player;
 pub mod score;
 pub mod star;
 
+use crate::events;
 pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(score::ScorePlugin)
+        app.add_event::<events::GameOver>()
+            .add_plugins(score::ScorePlugin)
             .add_plugins(star::StarPlugin)
             .add_plugins(enemy::EnemyPlugin)
             .add_plugins(player::PlayerPlugin);
