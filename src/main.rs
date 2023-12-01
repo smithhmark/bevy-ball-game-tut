@@ -1,8 +1,6 @@
 use bevy::prelude::*;
 
-mod components;
 mod events;
-mod resources;
 mod systems;
 
 mod enemy;
