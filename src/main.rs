@@ -1,11 +1,10 @@
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::{app::AppExit, prelude::*, window::PrimaryWindow};
 use rand::prelude::*;
 
 const PLAYER_SPEED: f32 = 500.0;
 const PLAYER_SIZE: f32 = 64.0;
 
-//const NUMBER_OF_ENEMIES: usize = 4;
-const NUMBER_OF_ENEMIES: usize = 1;
+const NUMBER_OF_ENEMIES: usize = 4;
 const ENEMY_SPEED: f32 = 200.0;
 const ENEMY_SIZE: f32 = 64.0;
 const ENEMY_SPAWN_TIME: f32 = 5.0;
@@ -34,6 +33,7 @@ fn main() {
         .add_systems(Update, tick_star_spawn_timer)
         .add_systems(Update, tick_enemy_spawn_timer)
         .add_systems(Update, spawn_stars_over_time)
+        .add_systems(Update, exit_game)
         //.add_systems(Update, spawn_enemies_over_time)
         .run();
 }
@@ -387,5 +387,11 @@ fn spawn_enemies_over_time(
                 direction: Vec2::new(random(), random::<f32>()).normalize(),
             },
         ));
+    }
+}
+
+fn exit_game(keyboard_input: Res<Input<KeyCode>>, mut app_exit_event_writer: EventWriter<AppExit>) {
+    if keyboard_input.just_pressed(KeyCode::Escape) {
+        app_exit_event_writer.send(AppExit);
     }
 }
