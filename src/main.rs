@@ -9,6 +9,7 @@ const ENEMY_SPEED: f32 = 200.0;
 const ENEMY_SIZE: f32 = 64.0;
 
 const NUMBER_OF_STARS: usize = 10;
+const STAR_SIZE: f32 = 30.0;
 
 fn main() {
     App::new()
@@ -22,6 +23,7 @@ fn main() {
         .add_systems(Update, confine_player_movement)
         .add_systems(Update, update_enemy_direction)
         .add_systems(Update, enemy_hit_player)
+        .add_systems(Update, player_hit_star)
         .run();
 }
 
@@ -226,6 +228,32 @@ fn update_enemy_direction(
                 source: sound_effect,
                 settings: PlaybackSettings::DESPAWN,
             });
+        }
+    }
+}
+
+fn player_hit_star(
+    mut commands: Commands,
+    mut player_query: Query<&Transform, With<Player>>,
+    star_query: Query<(Entity, &Transform), With<Star>>,
+    asset_server: Res<AssetServer>,
+) {
+    if let Ok(player_transform) = player_query.get_single_mut() {
+        let player_radius = PLAYER_SIZE / 2.0;
+        let star_radius = STAR_SIZE / 2.0;
+        for (star_entity, star_transform) in star_query.iter() {
+            let distance = player_transform
+                .translation
+                .distance(star_transform.translation);
+            if distance < player_radius + star_radius {
+                println!("point!");
+                let sound_effect = asset_server.load("sounds/laserLarge_000.ogg");
+                commands.spawn(AudioBundle {
+                    source: sound_effect,
+                    settings: PlaybackSettings::DESPAWN,
+                });
+                commands.entity(star_entity).despawn();
+            }
         }
     }
 }
