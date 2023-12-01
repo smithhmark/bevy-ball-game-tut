@@ -14,6 +14,7 @@ const STAR_SIZE: f32 = 30.0;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .init_resource::<Score>()
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, spawn_player)
         .add_systems(Startup, spawn_enemies)
@@ -24,6 +25,7 @@ fn main() {
         .add_systems(Update, update_enemy_direction)
         .add_systems(Update, enemy_hit_player)
         .add_systems(Update, player_hit_star)
+        .add_systems(Update, update_score)
         .run();
 }
 
@@ -36,6 +38,17 @@ struct Star {}
 #[derive(Component)]
 struct Enemy {
     direction: Vec2,
+}
+
+#[derive(Resource)]
+struct Score {
+    value: u32,
+}
+
+impl Default for Score {
+    fn default() -> Self {
+        Score { value: 0 }
+    }
 }
 
 fn spawn_player(
@@ -237,6 +250,7 @@ fn player_hit_star(
     mut player_query: Query<&Transform, With<Player>>,
     star_query: Query<(Entity, &Transform), With<Star>>,
     asset_server: Res<AssetServer>,
+    mut score: ResMut<Score>,
 ) {
     if let Ok(player_transform) = player_query.get_single_mut() {
         let player_radius = PLAYER_SIZE / 2.0;
@@ -246,6 +260,7 @@ fn player_hit_star(
                 .translation
                 .distance(star_transform.translation);
             if distance < player_radius + star_radius {
+                score.value += 1;
                 println!("point!");
                 let sound_effect = asset_server.load("sounds/laserLarge_000.ogg");
                 commands.spawn(AudioBundle {
@@ -281,5 +296,11 @@ fn enemy_hit_player(
                 commands.entity(player_entity).despawn();
             }
         }
+    }
+}
+
+fn update_score(score: Res<Score>) {
+    if score.is_changed() {
+        println!("Score: {}", score.value.to_string());
     }
 }
