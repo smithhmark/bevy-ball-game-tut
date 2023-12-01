@@ -18,6 +18,7 @@ fn main() {
         .add_systems(Update, enemy_movement)
         .add_systems(Update, confine_player_movement)
         .add_systems(Update, update_enemy_direction)
+        .add_systems(Update, enemy_hit_player)
         .run();
 }
 
@@ -195,6 +196,32 @@ fn update_enemy_direction(
                 source: sound_effect,
                 settings: PlaybackSettings::DESPAWN,
             });
+        }
+    }
+}
+
+fn enemy_hit_player(
+    mut commands: Commands,
+    mut player_query: Query<(Entity, &Transform), With<Player>>,
+    enemy_query: Query<&Transform, With<Enemy>>,
+    asset_server: Res<AssetServer>,
+) {
+    if let Ok((player_entity, player_transform)) = player_query.get_single_mut() {
+        let player_radius = PLAYER_SIZE / 2.0;
+        let enemy_radius = ENEMY_SIZE / 2.0;
+        for enemy_transform in enemy_query.iter() {
+            let distance = player_transform
+                .translation
+                .distance(enemy_transform.translation);
+            if distance < player_radius + enemy_radius {
+                println!("game over");
+                let sound_effect = asset_server.load("sounds/explosionCrunch_000.ogg");
+                commands.spawn(AudioBundle {
+                    source: sound_effect,
+                    settings: PlaybackSettings::DESPAWN,
+                });
+                commands.entity(player_entity).despawn();
+            }
         }
     }
 }
