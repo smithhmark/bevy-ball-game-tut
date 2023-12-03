@@ -15,3 +15,8 @@ to get very fast development cycles.
 - Official examples put audio assets in Resources, rather than use the asset_server over and over again
 - Episode 8 of the tutorial [here](https://youtu.be/i-Wczghlmxc?si=VngRYpFSBJu9jmWr&t=554) uses explicit `SystemsSet`'s to order player movement and then confining the movement to the playarea. That capability is deprecated as it is described. See the `TODO` in src/enemy/mod.rs
 
+# Differences from the Videos #
+- Video 9 uses `State<...>`, rather than `NextState<...>`
+- adding systems is different:
+  - now: `.add_systems(<Schedule>, <Systems>)`
+  - before: `.add_system(<Systems>)` &  `.add_startup_system(<Systems>)` 

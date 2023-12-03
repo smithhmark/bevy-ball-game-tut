@@ -6,6 +6,8 @@ pub mod systems;
 use resources::*;
 use systems::*;
 
+use crate::AppState;
+
 pub struct ScorePlugin;
 
 impl Plugin for ScorePlugin {
@@ -14,6 +16,7 @@ impl Plugin for ScorePlugin {
             .add_systems(Update, update_score)
             .add_systems(Update, update_high_scores)
             .add_systems(Update, high_scores_updated)
-            .init_resource::<HighScores>();
+            .init_resource::<HighScores>()
+            .add_systems(OnExit(AppState::Game), reset_score);
     }
 }

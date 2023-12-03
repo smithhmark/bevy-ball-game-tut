@@ -26,3 +26,7 @@ pub fn high_scores_updated(high_scores: Res<HighScores>) {
         println!("High scores: {:?}", high_scores.scores);
     }
 }
+
+pub fn reset_score(mut score: ResMut<Score>) {
+    score.value = 0;
+}

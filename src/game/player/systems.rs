@@ -137,7 +137,7 @@ pub fn enemy_hit_player(
                 .translation
                 .distance(enemy_transform.translation);
             if distance < player_radius + enemy_radius {
-                println!("game over");
+                //println!("game over");
                 let sound_effect = asset_server.load("sounds/explosionCrunch_000.ogg");
                 commands.spawn(AudioBundle {
                     source: sound_effect,
@@ -147,5 +147,11 @@ pub fn enemy_hit_player(
                 game_over_event_writer.send(GameOver { score: score.value });
             }
         }
+    }
+}
+
+pub fn despawn_player(mut commands: Commands, player_query: Query<Entity, With<Player>>) {
+    for player_entity in player_query.iter() {
+        commands.entity(player_entity).despawn();
     }
 }

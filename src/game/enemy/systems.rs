@@ -108,6 +108,7 @@ pub fn update_enemy_direction(
 pub fn tick_enemy_spawn_timer(mut enemy_spawn_timer: ResMut<EnemySpawnTimer>, time: Res<Time>) {
     enemy_spawn_timer.timer.tick(time.delta());
 }
+
 pub fn spawn_enemies_over_time(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -117,5 +118,11 @@ pub fn spawn_enemies_over_time(
     if enemy_spawn_timer.timer.finished() {
         let window = window_query.get_single().unwrap();
         spawn_single_enemy(&mut commands, window, &asset_server);
+    }
+}
+
+pub fn despawn_enemies(mut commands: Commands, enemy_query: Query<Entity, With<Enemy>>) {
+    for enemy_entity in enemy_query.iter() {
+        commands.entity(enemy_entity).despawn();
     }
 }
